@@ -4,9 +4,6 @@
       <router-link class="navbar-brand mr-auto" v-bind:to="{ name: 'home' }"
         >LaravelBNB</router-link
       >
-      <router-link class="btn nav-button" v-bind:to="{ name: 'second' }"
-        >Second</router-link
-      >
     </nav>
     <div class="container mt-4 mb-4 pl-4 pr-4">
       <router-view></router-view>

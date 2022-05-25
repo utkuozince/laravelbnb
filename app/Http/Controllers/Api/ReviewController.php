@@ -25,7 +25,7 @@ class ReviewController extends Controller
 
         $booking = Booking::findByReviewKey($data['id']);
 
-        if(null==$booking){
+        if(null===$booking){
             return abort(404);
         }
 
