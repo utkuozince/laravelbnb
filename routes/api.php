@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BookableController;
+use App\Http\Controllers\Api\BookablePriceController;
 use App\Models\Bookable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,10 +35,14 @@ Route::group(["namespace" => "App\Http\Controllers\Api"], function () {
     // Route::get('bookables/{id}', 'BookableController@show');
 
     Route::apiResource('bookables', 'BookableController')->only(['index', 'show']);
-    Route::get('bookables/{bookable}/availability', 'BookableAvailabilityController')
-        ->name('bookable.availability.show');
 
-    Route::get('/bookables/{bookable}/reviews', 'BookableReviewController')->name('bookable.reviews.show');
+    Route::get('bookables/{bookable}/availability', 'BookableAvailabilityController')
+        ->name('bookables.availability.show');
+    Route::get('/bookables/{bookable}/reviews', 'BookableReviewController')->name('bookables.reviews.index');
+    Route::get('/bookables/{bookable}/price', 'BookablePriceController' )->name('bookables.price.show');
+
+
+
 
     Route::get('/booking-by-review/{reviewKey}', 'BookingByReviewController')->name('booking.by-review.show');
 

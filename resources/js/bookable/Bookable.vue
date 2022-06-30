@@ -11,29 +11,49 @@
           <div v-else>Loading...</div>
         </div>
       </div>
-      <review-list  :bookable-id="this.$route.params.id"></review-list>
+      <review-list :bookable-id="this.$route.params.id"></review-list>
     </div>
     <div class="col-md-4 pb-4">
-      <availability :bookable-id="this.$route.params.id"></availability>
-      <!-- availability&prices -->
+      <availability
+        class="mb-4"
+        :bookable-id="this.$route.params.id"
+        @availability="checkPrice($event)"
+      ></availability>
+
+      <transition name="fade">
+       <price-breakdown v-if="price" :price= "price" class="mb-4"></price-breakdown>
+      </transition>
+
+      <div class="d-grid">
+        <transition name="fade">
+          <button class="btn btn-outline-secondary btn-block" v-if="price">
+            Book Now
+          </button>
+        </transition>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script>
 import Availability from "./Availability";
-import ReviewList from "./ReviewList"
+import ReviewList from "./ReviewList";
+import PriceBreakdown from "./PriceBreakdown";
+import { mapState } from "vuex";
 
 export default {
   components: {
     Availability,
     ReviewList,
+    PriceBreakdown,
   },
 
   data() {
     return {
       bookable: null,
       loading: false,
+      price: null,
     };
   },
 
@@ -44,6 +64,29 @@ export default {
       this.bookable = response.data.data;
       this.loading = false;
     });
+  },
+
+  computed: mapState({
+    lastSearch: "lastSearch",
+  }),
+
+  methods: {
+    async checkPrice(hasAvailability) {
+      if (!hasAvailability) {
+        this.price = null;
+        return;
+      }
+
+      try {
+        this.price = (
+          await axios.get(
+            `/api/bookables/${this.bookable.id}/price?from=${this.lastSearch.from}&to=${this.lastSearch.to}`
+          )
+        ).data.data;
+      } catch (err) {
+        this.price = null;
+      }
+    },
   },
 };
 </script>
