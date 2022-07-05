@@ -20,7 +20,8 @@ class BookingFactory extends Factory
         return [
 
             'from'=> $from,
-            'to'=> $to
+            'to'=> $to,
+            'price' => random_int(200,5000),
 
         ];
     }
