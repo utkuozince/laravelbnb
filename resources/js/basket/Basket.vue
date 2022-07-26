@@ -1,6 +1,6 @@
 <template>
   <div>
-     <success v-if="success">Congratulations on your purchase !</success>
+    <success v-if="success">Congratulations on your purchase !</success>
 
     <div class="row" v-else>
       <div class="col-md-8" v-if="itemsInBasket">
@@ -33,7 +33,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.last_name')"></v-errors>
+            <v-errors :errors="errorFor('customer.last_name')"></v-errors>
           </div>
         </div>
         <div class="row mb-4">
@@ -50,7 +50,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.email')"></v-errors>
+            <v-errors :errors="errorFor('customer.email')"></v-errors>
           </div>
         </div>
         <div class="row mb-4">
@@ -67,7 +67,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.street')"></v-errors>
+            <v-errors :errors="errorFor('customer.street')"></v-errors>
           </div>
           <div class="col-md-6">
             <label for="city">City</label>
@@ -82,7 +82,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.city')"></v-errors>
+            <v-errors :errors="errorFor('customer.city')"></v-errors>
           </div>
         </div>
 
@@ -100,7 +100,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.country')"></v-errors>
+            <v-errors :errors="errorFor('customer.country')"></v-errors>
           </div>
 
           <div class="col-md-4">
@@ -116,7 +116,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.state')"></v-errors>
+            <v-errors :errors="errorFor('customer.state')"></v-errors>
           </div>
 
           <div class="col-md-2">
@@ -132,7 +132,7 @@
                 },
               ]"
             />
-             <v-errors :errors="errorFor('customer.zip')"></v-errors>
+            <v-errors :errors="errorFor('customer.zip')"></v-errors>
           </div>
         </div>
 
@@ -212,7 +212,7 @@ export default {
   data() {
     return {
       loading: false,
-      bookingAttemped:false,
+      bookingAttemped: false,
       customer: {
         first_names: null,
         last_name: null,
@@ -232,17 +232,16 @@ export default {
       basket: (state) => state.basket.items,
     }),
 
-    success(){
-        return !this.loading && 0 === this.itemsInBasket && this.bookingAttemped;
-    }
+    success() {
+      return !this.loading && 0 === this.itemsInBasket && this.bookingAttemped;
+    },
   },
 
   methods: {
     async book() {
       this.loading = true;
       this.bookingAttemped = false;
-      this.errors = false;
-
+      this.error = false;
       try {
         await axios.post(`/api/checkout`, {
           customer: this.customer,
@@ -254,14 +253,14 @@ export default {
         });
         this.$store.dispatch("clearBasket");
       } catch (error) {
+        this.loading = false;
         this.errors = error.response && error.response.data.errors;
-
+        return;
       }
 
       this.loading = false;
       this.bookingAttemped = true;
-
-      this.bookingAttemped= false;
+      console.log("buraya kadar geldi 2");
     },
   },
 };

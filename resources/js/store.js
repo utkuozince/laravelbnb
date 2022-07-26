@@ -1,3 +1,8 @@
+import {
+    isLoggedIn,
+    logOut
+} from "./shared/utils/auth";
+
 export default {
 
     state: {
@@ -6,70 +11,122 @@ export default {
             to: null,
         },
 
-        basket:{
+        basket: {
             items: [],
+        },
+
+        isLoggedIn: false,
+        user: {
+
         }
     },
 
     mutations: {
-        setLastSearch(state, payload){
+        setLastSearch(state, payload) {
             state.lastSearch = payload;
         },
 
-        addToBasket(state,payload){
+        addToBasket(state, payload) {
             state.basket.items.push(payload);
         },
 
-        removeFromBasket(state,payload){
-            state.basket.items = state.basket.items.filter( item =>item.bookable.id !== payload);
+        removeFromBasket(state, payload) {
+            state.basket.items = state.basket.items.filter(item => item.bookable.id !== payload);
         },
 
-        setBasket(state,payload){
+        setBasket(state, payload) {
             state.basket = payload;
-        }
+        },
+
+        setUser(state, payload) {
+            state.user = payload;
+        },
+
+        setLoggedIn(state, payload) {
+            state.isLoggedIn = payload;
+        },
 
     },
 
     actions: {
-        setLastSearch(context, payload){
+        setLastSearch(context, payload) {
             context.commit('setLastSearch', payload);
             localStorage.setItem('lastSearch', JSON.stringify(payload));
         },
 
-        loadStoredState(context){
+        loadStoredState(context) {
             const lastSearch = localStorage.getItem('lastSearch');
-            if(lastSearch){
+            if (lastSearch) {
                 context.commit('setLastSearch', JSON.parse(lastSearch))
             }
 
             const basket = localStorage.getItem('basket');
-            if(basket){
+            if (basket) {
                 context.commit('setBasket', JSON.parse(basket))
             }
+
+            context.commit("setLoggedIn", isLoggedIn());
         },
 
-        addToBasket({commit,state},payload){
-            commit('addToBasket',payload);
+        addToBasket({
+            commit,
+            state
+        }, payload) {
+            commit('addToBasket', payload);
             localStorage.setItem('basket', JSON.stringify(state.basket));
         },
-        removeFromBasket({commit,state},payload){
-            commit('removeFromBasket',payload);
+        removeFromBasket({
+            commit,
+            state
+        }, payload) {
+            commit('removeFromBasket', payload);
             localStorage.setItem('basket', JSON.stringify(state.basket));
         },
-        clearBasket({commit,state}, payload){
-            commit('setBasket',{items: []});
+        clearBasket({
+            commit,
+            state
+        }, payload) {
+            commit('setBasket', {
+                items: []
+            });
             localStorage.setItem('basket', JSON.stringify(state.basket));
+        },
+        async loadUser({
+            commit,
+            dispatch
+        }) {
+            if (isLoggedIn()) {
+                try {
+                    const user = (await axios.get("/user")).data;
+                    commit('setUser', user);
+                    commit('setLoggedIn', true);
+                } catch (error) {
+                    if (401 === error.response.status) {
+                        dispatch('logout');
+                    }
+
+                }
+            }
+
+        },
+        logout({
+            commit
+        }) {
+            commit("setUser", {});
+            commit('setLoggedIn', false);
+            logOut();
+
         }
     },
 
     getters: {
         itemsInBasket: (state) => state.basket.items.length,
         inBasketAlready(state) {
-            return function(id){
+            return function (id) {
                 return state.basket.items.reduce(
                     (result, item) => result || item.bookable.id == id,
                     false
-                  );
+                );
             }
         }
     },

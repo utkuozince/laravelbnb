@@ -13,6 +13,7 @@ import Success from "./shared/components/Success";
 import StarRating from "./shared/components/StarRating";
 import ValidationErrors from "./shared/components/ValidationErrors";
 import storeDefinition from "./store";
+import axios from "axios";
 
 
 window.Vue = require('vue').default;
@@ -29,6 +30,19 @@ Vue.component('v-errors', ValidationErrors);
 
 const store = new Vuex.Store(storeDefinition);
 
+window.axios.interceptors.response.use(
+    response => {
+        return response;
+    },
+    error => {
+        if(401 === error.response.status){
+            store.dispatch("logout");
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 const app = new Vue({
     el: '#app',
     router,
@@ -37,8 +51,11 @@ const app = new Vue({
         "index": Index,
     },
 
-    beforeCreate(){
-        this.$store.dispatch("loadStoredState")
+   async beforeCreate(){
+        this.$store.dispatch("loadStoredState");
+        this.$store.dispatch("loadUser");
+
+
     }
 });
 
